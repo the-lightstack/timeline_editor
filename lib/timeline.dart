@@ -22,10 +22,19 @@ class TimelineEntity {
 /// Describes one entity that can be later dragged around in an [EditableTimeline]
 class TimedTile {
   final Widget child;
-  final int startPosition;
-  final int length;
-  TimedTile(
-      {required this.child, required this.startPosition, required this.length});
+  int? startPosition;
+  int? length;
+  int? index;
+
+  TimedTile({
+    required this.child,
+  });
+
+  TimedTile.internal(
+      {required this.index,
+      required this.startPosition,
+      required this.length,
+      required this.child});
 
   @override
   String toString() => "{Start: $startPosition | Length: $length}";
