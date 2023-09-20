@@ -22,7 +22,6 @@ class _TimelineTileState extends State<TimelineTile> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(
-        height: 50,
         color: Colors.amber,
         width: widget.scaling * widget.tileData.length!,
         child: widget.tileData.child,

@@ -45,9 +45,8 @@ class _EditableTimelineState extends State<EditableTimeline> {
             tileData: widget.controller.tiles[i],
             scaling: widget.scalingFactor)
     ];
-
     return SizedBox(
-        height: 100,
+        height: 70,
         width: MediaQuery.of(context).size.width,
         child: Container(
             color: Colors.blue,
@@ -61,6 +60,7 @@ class _EditableTimelineState extends State<EditableTimeline> {
 
 /// The developer uses this to interact with the [EditableTimeline] . You can
 /// listen to changes as well as add and modify the [TimedTile]s
+/// TODO: auto scroll to new tile after adding it
 class EditableTimelineController extends ValueNotifier<TimelineEntity> {
   final int defaultTileLength;
   EditableTimelineController({this.defaultTileLength = 5})

@@ -54,12 +54,16 @@ class _MainAppState extends State<MainApp> {
         floatingActionButton: FloatingActionButton(
             child: const Icon(Icons.add),
             onPressed: () => _controller.addTile(TimedTile(
-                  child: Text(genName()),
+                  child: Center(
+                      child: Text(
+                    genName(),
+                    style: const TextStyle(fontSize: 14),
+                  )),
                 ))),
         body: Center(
           child: EditableTimeline(
             controller: _controller,
-            scalingFactor: MediaQuery.of(context).size.width / (8 * 3),
+            scalingFactor: MediaQuery.of(context).size.width / (8 * 2),
           ),
         ),
       ),
