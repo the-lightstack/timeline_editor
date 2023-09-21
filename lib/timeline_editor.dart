@@ -9,10 +9,10 @@ import 'package:collection/collection.dart';
 
 class EditableTimeline extends StatefulWidget {
   final EditableTimelineController controller;
-  final double scalingFactor;
+  final int totalSteps;
 
   const EditableTimeline(
-      {super.key, required this.controller, this.scalingFactor = 50});
+      {super.key, required this.controller, this.totalSteps = 20});
 
   @override
   State<EditableTimeline> createState() => _EditableTimelineState();
@@ -41,9 +41,12 @@ class _EditableTimelineState extends State<EditableTimeline> {
     final List<TimelineTile> ttiles = <TimelineTile>[
       for (int i = 0; i < widget.controller.tiles.length; i++)
         TimelineTile(
-            key: UniqueKey(),
-            tileData: widget.controller.tiles[i],
-            scaling: widget.scalingFactor)
+          key: UniqueKey(),
+          tileData: widget.controller.tiles[i],
+          controller: widget.controller,
+          totalSteps: widget.totalSteps,
+          ownIndex: i,
+        )
     ];
     return SizedBox(
         height: 70,
@@ -84,6 +87,15 @@ class EditableTimelineController extends ValueNotifier<TimelineEntity> {
         child: t.child);
     value.addTile(correctTile);
     notifyListeners();
+  }
+
+  void changeTileLength(int index, int newLength) {
+    value.tiles[index].length = newLength;
+
+    // For all higher indices update startpos
+    for (int i = index; i < value.tiles.length; i++) {
+      value.tiles[i].startPosition = computeStartPosition(i);
+    }
   }
 
   void _reorderTiles(int oldIndex, int newIndex) {
