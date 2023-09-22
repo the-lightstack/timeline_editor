@@ -10,9 +10,13 @@ import 'package:collection/collection.dart';
 class EditableTimeline extends StatefulWidget {
   final EditableTimelineController controller;
   final int totalSteps;
+  final Widget? Function(BuildContext, int)? underBarBuilder;
 
   const EditableTimeline(
-      {super.key, required this.controller, this.totalSteps = 20});
+      {super.key,
+      required this.controller,
+      this.totalSteps = 20,
+      this.underBarBuilder});
 
   @override
   State<EditableTimeline> createState() => _EditableTimelineState();
@@ -20,18 +24,30 @@ class EditableTimeline extends StatefulWidget {
 
 class _EditableTimelineState extends State<EditableTimeline> {
   void _renderScreen() {
-    print("Render again!");
     setState(() {});
   }
+
+  late ScrollController _scrollControllerReorderableList;
+  late ScrollController _scrollControllerNamingLine;
 
   @override
   void initState() {
     widget.controller.addListener(_renderScreen);
+    _scrollControllerNamingLine = ScrollController();
+    _scrollControllerReorderableList = ScrollController();
+
+    _scrollControllerReorderableList.addListener(() {
+      _scrollControllerNamingLine
+          .jumpTo(_scrollControllerReorderableList.offset);
+    });
+
     super.initState();
   }
 
   @override
   void dispose() {
+    _scrollControllerNamingLine.dispose();
+    _scrollControllerReorderableList.dispose();
     widget.controller.removeListener(_renderScreen);
     super.dispose();
   }
@@ -48,16 +64,46 @@ class _EditableTimelineState extends State<EditableTimeline> {
           ownIndex: i,
         )
     ];
+    final int lus = widget.controller.totalLengthUnits();
     return SizedBox(
-        height: 70,
+        height: 100,
         width: MediaQuery.of(context).size.width,
-        child: Container(
-            color: Colors.blue,
-            child: ReorderableListView(
-              scrollDirection: Axis.horizontal,
-              onReorder: widget.controller._reorderTiles,
-              children: ttiles,
-            )));
+        child: Column(
+          children: [
+            Flexible(
+              flex: 4,
+              child: Container(
+                  color: Colors.blue,
+                  child: ReorderableListView(
+                    scrollController: _scrollControllerReorderableList,
+                    scrollDirection: Axis.horizontal,
+                    onReorder: widget.controller._reorderTiles,
+                    children: ttiles,
+                  )),
+            ),
+            widget.underBarBuilder == null
+                ? const SizedBox.shrink()
+                : SizedBox(
+                    height: 30,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
+                      child: ListView.separated(
+                        physics: const NeverScrollableScrollPhysics(),
+                        controller: _scrollControllerNamingLine,
+                        itemBuilder: widget.underBarBuilder!,
+                        separatorBuilder: (_, __) => SizedBox(
+                          height: 10,
+                          width: MediaQuery.of(context).size.width /
+                              widget.totalSteps,
+                        ),
+                        itemCount:
+                            lus < widget.totalSteps ? widget.totalSteps : lus,
+                        scrollDirection: Axis.horizontal,
+                      ),
+                    ),
+                  )
+          ],
+        ));
   }
 }
 
@@ -76,6 +122,14 @@ class EditableTimelineController extends ValueNotifier<TimelineEntity> {
         .map((e) => e.length!)
         .toList(growable: false)
         .sum;
+  }
+
+  int totalLengthUnits() {
+    final lastTile = value.tiles.lastOrNull;
+    if (lastTile == null) {
+      return 0;
+    }
+    return lastTile.startPosition! + lastTile.length!;
   }
 
   List<TimedTile> get tiles => value.tiles;
@@ -98,12 +152,16 @@ class EditableTimelineController extends ValueNotifier<TimelineEntity> {
     }
   }
 
-  void _reorderTiles(int oldIndex, int newIndex) {
-    // If this doesn't work, do:
-    // 1) get oldIndex
-    // 2) insert to new index
-    // 3) delete old index
+  void removeTile(int index) {
+    value.tiles.removeAt(index);
 
+    // update index for all higher ups
+    for (int i = index; i > value.tiles.length; i++) {
+      value.tiles[i].index = i;
+    }
+  }
+
+  void _reorderTiles(int oldIndex, int newIndex) {
     if (oldIndex < newIndex) {
       newIndex -= 1;
     }

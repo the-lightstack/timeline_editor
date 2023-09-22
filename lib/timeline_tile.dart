@@ -52,7 +52,6 @@ class _TimelineTileState extends State<TimelineTile> {
                   final double deltaX = details.localPosition.dx - _dragStartX!;
                   final double stepPixelSize =
                       MediaQuery.of(context).size.width / widget.totalSteps;
-                  print(stepPixelSize);
 
                   final int lengthIncrement =
                       (deltaX / stepPixelSize).truncate();

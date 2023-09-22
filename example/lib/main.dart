@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:timeline_editor/timeline.dart';
 import 'package:timeline_editor/timeline_editor.dart';
@@ -67,7 +65,19 @@ class _MainAppState extends State<MainApp> {
           child: EditableTimeline(
             controller: _controller,
             // scalingFactor: MediaQuery.of(context).size.width / (8 * 2),
-            totalSteps: 8 * 2,
+            totalSteps: 8,
+            underBarBuilder: (BuildContext ctx, int index) {
+              final int i = index + 1;
+              if (i % 8 == 0) {
+                return Text(
+                  "${(i / 8).truncate()}",
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.bold),
+                );
+              } else {
+                return Text("${i % 8}");
+              }
+            },
           ),
         ),
       ),
