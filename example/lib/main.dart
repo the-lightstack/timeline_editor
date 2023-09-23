@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:timeline_editor/timeline.dart';
 import 'package:timeline_editor/timeline_editor.dart';
+import 'package:timeline_editor/timeline_viewer.dart';
 
 void main() {
   runApp(const MainApp());
@@ -47,6 +48,21 @@ class _MainAppState extends State<MainApp> {
     return s;
   }
 
+  Widget? barBuilder(BuildContext ctx, int index) {
+    final int i = index + 1;
+    if (i % 8 == 0) {
+      return SizedBox(
+        width: 0,
+        child: Text(
+          "${(i / 8).truncate()}",
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+      );
+    } else {
+      return SizedBox(width: 0, child: Text("${i % 8}"));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -77,25 +93,22 @@ class _MainAppState extends State<MainApp> {
                   ),
                 ))),
         body: Center(
-          child: EditableTimeline(
-            controller: _controller,
-            // scalingFactor: MediaQuery.of(context).size.width / (8 * 2),
-            totalSteps: 8,
-            underBarBuilder: (BuildContext ctx, int index) {
-              final int i = index + 1;
-              if (i % 8 == 0) {
-                return SizedBox(
-                  width: 0,
-                  child: Text(
-                    "${(i / 8).truncate()}",
-                    style: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                );
-              } else {
-                return SizedBox(width: 0, child: Text("${i % 8}"));
-              }
-            },
+          child: SizedBox(
+            height: 400,
+            child: Column(
+              children: [
+                EditableTimeline(
+                    controller: _controller,
+                    // scalingFactor: MediaQuery.of(context).size.width / (8 * 2),
+                    totalSteps: 8,
+                    underBarBuilder: barBuilder),
+                TimelineViewer(
+                  tiles: _controller.tiles,
+                  underBarBuilder: barBuilder,
+                  totalSteps: 8,
+                )
+              ],
+            ),
           ),
         ),
       ),

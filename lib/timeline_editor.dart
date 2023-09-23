@@ -46,6 +46,7 @@ class _EditableTimelineState extends State<EditableTimeline> {
     _scrollControllerNamingLine.dispose();
     _scrollControllerReorderableList.dispose();
     widget.controller.removeListener(_renderScreen);
+    widget.controller.dispose();
     super.dispose();
   }
 
@@ -165,6 +166,17 @@ class EditableTimelineController extends ValueNotifier<TimelineEntity> {
             curve: Curves.easeInOut);
       });
     }
+  }
+
+  void restoreAllTiles(List<TimedTile> tl) {
+    for (var element in tl) {
+      assert(element.length != null);
+      assert(element.startPosition != null);
+      assert(element.index != null);
+    }
+
+    value.tiles = tl;
+    notifyListeners();
   }
 
   void changeTileLength(int index, int newLength) {
