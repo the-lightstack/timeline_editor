@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:timeline_editor/timeline.dart';
 import 'package:timeline_editor/timeline_editor.dart';
@@ -53,11 +55,24 @@ class _MainAppState extends State<MainApp> {
             child: const Icon(Icons.add),
             onPressed: () => _controller.addTile(TimedTile(
                   child: Container(
-                    color: Colors.purple,
+                    // color: Colors.purple,
+                    decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                            begin: Alignment.bottomCenter,
+                            end: Alignment.topCenter,
+                            colors: [
+                          Color.fromARGB(255, 102, 23, 141),
+                          Color.fromARGB(255, 183, 87, 231)
+                        ])),
                     child: Center(
                         child: Text(
                       genName(),
-                      style: const TextStyle(fontSize: 14),
+                      maxLines: 1,
+                      style: const TextStyle(
+                          overflow: TextOverflow.fade,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white),
                     )),
                   ),
                 ))),
@@ -69,13 +84,16 @@ class _MainAppState extends State<MainApp> {
             underBarBuilder: (BuildContext ctx, int index) {
               final int i = index + 1;
               if (i % 8 == 0) {
-                return Text(
-                  "${(i / 8).truncate()}",
-                  style: const TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.bold),
+                return SizedBox(
+                  width: 0,
+                  child: Text(
+                    "${(i / 8).truncate()}",
+                    style: const TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
                 );
               } else {
-                return Text("${i % 8}");
+                return SizedBox(width: 0, child: Text("${i % 8}"));
               }
             },
           ),

@@ -36,10 +36,7 @@ class _EditableTimelineState extends State<EditableTimeline> {
     _scrollControllerNamingLine = ScrollController();
     _scrollControllerReorderableList = ScrollController();
 
-    _scrollControllerReorderableList.addListener(() {
-      _scrollControllerNamingLine
-          .jumpTo(_scrollControllerReorderableList.offset);
-    });
+    widget.controller._setScrollController(_scrollControllerReorderableList);
 
     super.initState();
   }
@@ -74,11 +71,20 @@ class _EditableTimelineState extends State<EditableTimeline> {
               flex: 4,
               child: Container(
                   color: Colors.blue,
-                  child: ReorderableListView(
-                    scrollController: _scrollControllerReorderableList,
-                    scrollDirection: Axis.horizontal,
-                    onReorder: widget.controller._reorderTiles,
-                    children: ttiles,
+                  child: NotificationListener(
+                    onNotification: (notification) {
+                      if (notification is ScrollUpdateNotification) {
+                        _scrollControllerNamingLine
+                            .jumpTo(_scrollControllerReorderableList.offset);
+                      }
+                      return false;
+                    },
+                    child: ReorderableListView(
+                      scrollController: _scrollControllerReorderableList,
+                      scrollDirection: Axis.horizontal,
+                      onReorder: widget.controller.reorderTiles,
+                      children: ttiles,
+                    ),
                   )),
             ),
             widget.underBarBuilder == null
@@ -97,7 +103,9 @@ class _EditableTimelineState extends State<EditableTimeline> {
                               widget.totalSteps,
                         ),
                         itemCount:
-                            lus < widget.totalSteps ? widget.totalSteps : lus,
+                            ((lus < widget.totalSteps ? widget.totalSteps : lus)
+                                  ..toInt()) +
+                                (widget.controller.defaultTileLength * 2),
                         scrollDirection: Axis.horizontal,
                       ),
                     ),
@@ -109,11 +117,16 @@ class _EditableTimelineState extends State<EditableTimeline> {
 
 /// The developer uses this to interact with the [EditableTimeline] . You can
 /// listen to changes as well as add and modify the [TimedTile]s
-/// TODO: auto scroll to new tile after adding it
 class EditableTimelineController extends ValueNotifier<TimelineEntity> {
   final int defaultTileLength;
+  ScrollController? _scrollController;
+
   EditableTimelineController({this.defaultTileLength = 5})
       : super(TimelineEntity());
+
+  void _setScrollController(ScrollController c) {
+    _scrollController = c;
+  }
 
   @visibleForTesting
   int computeStartPosition(int index) {
@@ -140,7 +153,18 @@ class EditableTimelineController extends ValueNotifier<TimelineEntity> {
         length: defaultTileLength,
         child: t.child);
     value.addTile(correctTile);
+
+    // view has to update to include new widget first
     notifyListeners();
+
+    if (_scrollController != null) {
+      Future.delayed(const Duration(milliseconds: 200), () {
+        _scrollController!.animateTo(
+            _scrollController!.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 400),
+            curve: Curves.easeInOut);
+      });
+    }
   }
 
   void changeTileLength(int index, int newLength) {
@@ -150,23 +174,32 @@ class EditableTimelineController extends ValueNotifier<TimelineEntity> {
     for (int i = index; i < value.tiles.length; i++) {
       value.tiles[i].startPosition = computeStartPosition(i);
     }
+    notifyListeners();
   }
 
   void removeTile(int index) {
     value.tiles.removeAt(index);
 
     // update index for all higher ups
-    for (int i = index; i > value.tiles.length; i++) {
+    for (int i = index; i < value.tiles.length; i++) {
       value.tiles[i].index = i;
+      value.tiles[i].startPosition = computeStartPosition(i);
     }
+    notifyListeners();
   }
 
-  void _reorderTiles(int oldIndex, int newIndex) {
+  @visibleForTesting
+  void reorderTiles(int oldIndex, int newIndex) {
     if (oldIndex < newIndex) {
       newIndex -= 1;
     }
     final temp = value.tiles.removeAt(oldIndex);
     value.tiles.insert(newIndex, temp);
+
+    // OPTIMIZE: recompute start positions
+    for (int i = 0; i < value.tiles.length; i++) {
+      value.tiles[i].startPosition = computeStartPosition(i);
+    }
 
     notifyListeners();
   }
