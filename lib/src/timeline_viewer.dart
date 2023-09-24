@@ -8,13 +8,20 @@ class TimelineViewer extends StatefulWidget {
   final int totalSteps;
   final Widget? Function(BuildContext, int)? underBarBuilder;
   final TimelineEditorStyle? style;
+  final List<PopupMenuEntry> Function(int index)? popupMenuItemsBuilder;
+  final Function(int index)? directDoubleClickAction;
 
   const TimelineViewer(
       {super.key,
       required this.tiles,
       this.totalSteps = 20,
       this.underBarBuilder,
-      this.style});
+      this.style,
+      this.popupMenuItemsBuilder,
+      this.directDoubleClickAction})
+      : assert(
+            !(popupMenuItemsBuilder != null && directDoubleClickAction != null),
+            "Choose one. Either have direct action on double click or show context menu with multiple actions");
 
   @override
   State<TimelineViewer> createState() => _TimelineViewerState();
@@ -64,10 +71,25 @@ class _TimelineViewerState extends State<TimelineViewer> {
       for (int i = 0; i < widget.tiles.length; i++)
         Padding(
           padding: widget.style?.tilePadding ?? const EdgeInsets.all(4.0),
-          child: SizedBox(
-            width: (MediaQuery.of(context).size.width / widget.totalSteps) *
-                widget.tiles[i].length!,
-            child: widget.tiles[i].child,
+          child: GestureDetector(
+            onDoubleTapDown: (details) {
+              if (widget.directDoubleClickAction != null) {
+                widget.directDoubleClickAction!(i);
+              } else if (widget.popupMenuItemsBuilder != null) {
+                final double wsdy =
+                    details.globalPosition.dy - details.localPosition.dy;
+                showMenu(
+                    context: context,
+                    position: RelativeRect.fromLTRB(details.globalPosition.dx,
+                        wsdy, details.globalPosition.dx, wsdy),
+                    items: widget.popupMenuItemsBuilder!(i));
+              }
+            },
+            child: SizedBox(
+              width: (MediaQuery.of(context).size.width / widget.totalSteps) *
+                  widget.tiles[i].length!,
+              child: widget.tiles[i].child,
+            ),
           ),
         )
     ];

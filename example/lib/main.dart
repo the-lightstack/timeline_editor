@@ -32,6 +32,18 @@ class MainApp extends StatefulWidget {
 }
 
 class _MainAppState extends State<MainApp> {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(home: MyApp());
+  }
+}
+
+class MyApp extends StatefulWidget {
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   final EditableTimelineController _controller =
       EditableTimelineController(defaultTileLength: 4);
   int counter = 0;
@@ -59,6 +71,20 @@ class _MainAppState extends State<MainApp> {
     }
   }
 
+  void _showIndex(int ind, BuildContext ctx) {
+    showDialog(
+      context: ctx,
+      builder: (_) {
+        return SimpleDialog(
+          title: const Text(
+            "Details",
+          ),
+          children: [Center(child: Text("Details for $ind"))],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final tStyle = TimelineEditorStyle(
@@ -71,70 +97,67 @@ class _MainAppState extends State<MainApp> {
               color: const Color.fromARGB(255, 1, 12, 167),
               width: 3,
             )));
-
-    return MaterialApp(
-      home: Scaffold(
-        floatingActionButton: FloatingActionButton(
-            child: const Icon(Icons.add),
-            onPressed: () => _controller.addTile(TimedTile(
-                  child: Container(
-                    // color: Colors.purple,
-                    decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
-                            colors: [
-                          Color.fromARGB(255, 102, 23, 141),
-                          Color.fromARGB(255, 183, 87, 231)
-                        ])),
-                    child: Center(
-                        child: Text(
-                      genName(),
-                      maxLines: 1,
-                      style: const TextStyle(
-                          overflow: TextOverflow.fade,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white),
-                    )),
-                  ),
-                ))),
-        body: Center(
-          child: SizedBox(
-            height: 400,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  EditableTimeline(
-                    controller: _controller,
-                    // scalingFactor: MediaQuery.of(context).size.width / (8 * 2),
-                    totalSteps: 8,
-                    underBarBuilder: barBuilder,
-                    popupMenuItems: [
-                      PopupItemWithIndex(
-                          onTap: (index) {
-                            // showDialog(context: context, builder: (ctx){return SimpleDialog(title: "Details for ${widget.ownIndex}"},))
-                            assert(index != null);
-                            // do other stuff
+    return Scaffold(
+      floatingActionButton: FloatingActionButton(
+          child: const Icon(Icons.add),
+          onPressed: () => _controller.addTile(TimedTile(
+                child: Container(
+                  // color: Colors.purple,
+                  decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter,
+                          colors: [
+                        Color.fromARGB(255, 102, 23, 141),
+                        Color.fromARGB(255, 183, 87, 231)
+                      ])),
+                  child: Center(
+                      child: Text(
+                    genName(),
+                    maxLines: 1,
+                    style: const TextStyle(
+                        overflow: TextOverflow.fade,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white),
+                  )),
+                ),
+              ))),
+      body: Center(
+        child: SizedBox(
+          height: 400,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                EditableTimeline(
+                  controller: _controller,
+                  // scalingFactor: MediaQuery.of(context).size.width / (8 * 2),
+                  totalSteps: 8,
+                  underBarBuilder: barBuilder,
+                  popupMenuItemsBuilder: (int index) {
+                    return [
+                      PopupMenuItem(
+                          onTap: () {
+                            _showIndex(index, context);
                           },
-                          index: 5,
-                          child: Row(
-                            children: [
-                              Icon(Icons.details),
-                              const Text("Details")
-                            ],
-                          ))
-                    ],
-                    style: tStyle,
-                  ),
-                  TimelineViewer(
-                      tiles: _controller.tiles,
-                      underBarBuilder: barBuilder,
-                      totalSteps: 8,
-                      style: tStyle)
-                ],
-              ),
+                          child: const Row(
+                            children: [Icon(Icons.details), Text("Details")],
+                          )),
+                    ];
+                  },
+                  style: tStyle,
+                ),
+                TimelineViewer(
+                  tiles: _controller.tiles,
+                  underBarBuilder: barBuilder,
+                  totalSteps: 8,
+                  style: tStyle,
+                  directDoubleClickAction: (i) {
+                    _showIndex(i, context);
+                  },
+                )
+              ],
             ),
           ),
         ),

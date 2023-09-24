@@ -3,19 +3,13 @@ import 'package:timeline_editor/src/timeline_data.dart';
 import 'package:timeline_editor/src/timeline_editor.dart';
 import 'package:timeline_editor/src/timeline_style.dart';
 
-class PopupItemWithIndex extends PopupMenuItem {
-  final int? index;
-  final void Function(int)? onTap;
-  const PopupItemWithIndex({this.index, super.key, required super.child});
-}
-
 class TimelineTile extends StatefulWidget {
   final TimedTile tileData;
   final int totalSteps;
   final EditableTimelineController controller;
   final int ownIndex;
   final TimelineEditorStyle? style;
-  final List<PopupMenuEntry>? popupMenuItems;
+  final List<PopupMenuEntry> Function(int index)? popupMenuItemsBuilder;
 
   const TimelineTile(
       {super.key,
@@ -24,7 +18,7 @@ class TimelineTile extends StatefulWidget {
       required this.controller,
       required this.ownIndex,
       this.style,
-      this.popupMenuItems});
+      this.popupMenuItemsBuilder});
 
   @override
   State<TimelineTile> createState() => _TimelineTileState();
@@ -60,12 +54,9 @@ class _TimelineTileState extends State<TimelineTile> {
                   flex: 5,
                   child: GestureDetector(
                       onDoubleTapDown: (details) {
-                        final double wsdx = details.globalPosition.dx -
-                            details.localPosition.dx;
                         final double wsdy = details.globalPosition.dy -
                             details.localPosition.dy;
 
-                        // TODO: make this dependent on style topOrBottom
                         showMenu(
                             context: context,
                             position: RelativeRect.fromLTRB(
@@ -73,7 +64,7 @@ class _TimelineTileState extends State<TimelineTile> {
                                 wsdy,
                                 details.globalPosition.dx,
                                 wsdy),
-                            items: widget.popupMenuItems == null
+                            items: widget.popupMenuItemsBuilder == null
                                 ? <PopupMenuEntry>[
                                     PopupMenuItem(
                                         onTap: () {
@@ -88,7 +79,8 @@ class _TimelineTileState extends State<TimelineTile> {
                                         ))
                                   ]
                                 : ([
-                                    widget.popupMenuItems!,
+                                    widget.popupMenuItemsBuilder!(
+                                        widget.ownIndex),
                                     <PopupMenuEntry>[
                                       const PopupMenuDivider(),
                                       PopupMenuItem(
