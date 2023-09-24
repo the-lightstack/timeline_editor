@@ -3,12 +3,19 @@ import 'package:timeline_editor/src/timeline_data.dart';
 import 'package:timeline_editor/src/timeline_editor.dart';
 import 'package:timeline_editor/src/timeline_style.dart';
 
+class PopupItemWithIndex extends PopupMenuItem {
+  final int? index;
+  final void Function(int)? onTap;
+  const PopupItemWithIndex({this.index, super.key, required super.child});
+}
+
 class TimelineTile extends StatefulWidget {
   final TimedTile tileData;
   final int totalSteps;
   final EditableTimelineController controller;
   final int ownIndex;
   final TimelineEditorStyle? style;
+  final List<PopupMenuEntry>? popupMenuItems;
 
   const TimelineTile(
       {super.key,
@@ -16,7 +23,8 @@ class TimelineTile extends StatefulWidget {
       required this.totalSteps,
       required this.controller,
       required this.ownIndex,
-      this.style});
+      this.style,
+      this.popupMenuItems});
 
   @override
   State<TimelineTile> createState() => _TimelineTileState();
@@ -48,7 +56,56 @@ class _TimelineTileState extends State<TimelineTile> {
               _displayLength,
           child: Row(
             children: [
-              Flexible(flex: 5, child: widget.tileData.child),
+              Flexible(
+                  flex: 5,
+                  child: GestureDetector(
+                      onDoubleTapDown: (details) {
+                        final double wsdx = details.globalPosition.dx -
+                            details.localPosition.dx;
+                        final double wsdy = details.globalPosition.dy -
+                            details.localPosition.dy;
+
+                        // TODO: make this dependent on style topOrBottom
+                        showMenu(
+                            context: context,
+                            position: RelativeRect.fromLTRB(
+                                details.globalPosition.dx,
+                                wsdy,
+                                details.globalPosition.dx,
+                                wsdy),
+                            items: widget.popupMenuItems == null
+                                ? <PopupMenuEntry>[
+                                    PopupMenuItem(
+                                        onTap: () {
+                                          widget.controller
+                                              .removeTile(widget.ownIndex);
+                                        },
+                                        child: const Row(
+                                          children: [
+                                            Icon(Icons.delete),
+                                            Text("Remove")
+                                          ],
+                                        ))
+                                  ]
+                                : ([
+                                    widget.popupMenuItems!,
+                                    <PopupMenuEntry>[
+                                      const PopupMenuDivider(),
+                                      PopupMenuItem(
+                                          onTap: () {
+                                            widget.controller
+                                                .removeTile(widget.ownIndex);
+                                          },
+                                          child: const Row(
+                                            children: [
+                                              Icon(Icons.delete),
+                                              Text("Remove")
+                                            ],
+                                          )),
+                                    ]
+                                  ].expand((element) => element).toList()));
+                      },
+                      child: widget.tileData.child)),
               GestureDetector(
                 onHorizontalDragUpdate: (details) {
                   assert(_dragStartX != null);

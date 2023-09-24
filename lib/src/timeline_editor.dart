@@ -11,13 +11,15 @@ class EditableTimeline extends StatefulWidget {
   final int totalSteps;
   final Widget? Function(BuildContext, int)? underBarBuilder;
   final TimelineEditorStyle? style;
+  final List<PopupMenuEntry>? popupMenuItems;
 
   const EditableTimeline(
       {super.key,
       required this.controller,
       this.style,
       this.totalSteps = 20,
-      this.underBarBuilder});
+      this.underBarBuilder,
+      this.popupMenuItems});
 
   @override
   State<EditableTimeline> createState() => _EditableTimelineState();
@@ -62,6 +64,7 @@ class _EditableTimelineState extends State<EditableTimeline> {
           totalSteps: widget.totalSteps,
           ownIndex: i,
           style: widget.style,
+          popupMenuItems: widget.popupMenuItems,
         )
     ];
     final int lus = widget.controller.totalLengthUnits();

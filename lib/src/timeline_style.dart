@@ -6,9 +6,11 @@ class TimelineEditorStyle {
   BoxDecoration? timelineDecoration;
   BoxDecoration? numberlineDecoration;
   double? timelineAndBarHeight;
+  bool doubleClickDialogAbove;
   TimelineEditorStyle(
       {this.numberlineDecoration,
       this.timelineDecoration,
       this.tilePadding,
-      this.timelineAndBarHeight});
+      this.timelineAndBarHeight,
+      this.doubleClickDialogAbove = true});
 }

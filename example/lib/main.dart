@@ -66,9 +66,9 @@ class _MainAppState extends State<MainApp> {
         tilePadding:
             const EdgeInsets.only(top: 8, bottom: 8, left: 2, right: 2),
         timelineDecoration: BoxDecoration(
-            color: Colors.black12,
+            color: const Color.fromARGB(255, 238, 238, 238),
             border: Border.all(
-              color: Colors.black,
+              color: const Color.fromARGB(255, 1, 12, 167),
               width: 3,
             )));
 
@@ -111,6 +111,21 @@ class _MainAppState extends State<MainApp> {
                     // scalingFactor: MediaQuery.of(context).size.width / (8 * 2),
                     totalSteps: 8,
                     underBarBuilder: barBuilder,
+                    popupMenuItems: [
+                      PopupItemWithIndex(
+                          onTap: (index) {
+                            // showDialog(context: context, builder: (ctx){return SimpleDialog(title: "Details for ${widget.ownIndex}"},))
+                            assert(index != null);
+                            // do other stuff
+                          },
+                          index: 5,
+                          child: Row(
+                            children: [
+                              Icon(Icons.details),
+                              const Text("Details")
+                            ],
+                          ))
+                    ],
                     style: tStyle,
                   ),
                   TimelineViewer(
