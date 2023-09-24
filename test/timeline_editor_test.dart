@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:timeline_editor/timeline.dart';
-import 'package:timeline_editor/timeline_editor.dart';
+import 'package:timeline_editor/src/timeline_data.dart';
+import 'package:timeline_editor/src/timeline_editor.dart';
 
 void main() {
   test("timeline controller compute startPos", () {

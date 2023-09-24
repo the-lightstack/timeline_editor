@@ -161,7 +161,7 @@ packages:
     source: hosted
     version: "0.6.0"
   timeline_editor:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       path: ".."
       relative: true

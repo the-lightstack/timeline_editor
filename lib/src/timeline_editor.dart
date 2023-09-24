@@ -1,20 +1,21 @@
 library timeline_editor;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
-import 'package:timeline_editor/timeline.dart';
-import 'package:timeline_editor/timeline_tile.dart';
+import 'package:timeline_editor/src/timeline_data.dart';
+import 'package:timeline_editor/src/timeline_style.dart';
+import 'package:timeline_editor/src/timeline_tile.dart';
 import 'package:collection/collection.dart';
 
 class EditableTimeline extends StatefulWidget {
   final EditableTimelineController controller;
   final int totalSteps;
   final Widget? Function(BuildContext, int)? underBarBuilder;
+  final TimelineEditorStyle? style;
 
   const EditableTimeline(
       {super.key,
       required this.controller,
+      this.style,
       this.totalSteps = 20,
       this.underBarBuilder});
 
@@ -60,18 +61,19 @@ class _EditableTimelineState extends State<EditableTimeline> {
           controller: widget.controller,
           totalSteps: widget.totalSteps,
           ownIndex: i,
+          style: widget.style,
         )
     ];
     final int lus = widget.controller.totalLengthUnits();
     return SizedBox(
-        height: 100,
+        height: widget.style?.timelineAndBarHeight ?? 100,
         width: MediaQuery.of(context).size.width,
         child: Column(
           children: [
             Flexible(
               flex: 4,
               child: Container(
-                  color: Colors.blue,
+                  decoration: widget.style?.timelineDecoration,
                   child: NotificationListener(
                     onNotification: (notification) {
                       if (notification is ScrollUpdateNotification) {
@@ -92,22 +94,26 @@ class _EditableTimelineState extends State<EditableTimeline> {
                 ? const SizedBox.shrink()
                 : SizedBox(
                     height: 30,
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
-                      child: ListView.separated(
-                        physics: const NeverScrollableScrollPhysics(),
-                        controller: _scrollControllerNamingLine,
-                        itemBuilder: widget.underBarBuilder!,
-                        separatorBuilder: (_, __) => SizedBox(
-                          height: 10,
-                          width: MediaQuery.of(context).size.width /
-                              widget.totalSteps,
+                    child: Container(
+                      decoration: widget.style?.numberlineDecoration,
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
+                        child: ListView.separated(
+                          physics: const NeverScrollableScrollPhysics(),
+                          controller: _scrollControllerNamingLine,
+                          itemBuilder: widget.underBarBuilder!,
+                          separatorBuilder: (_, __) => SizedBox(
+                            height: 10,
+                            width: MediaQuery.of(context).size.width /
+                                widget.totalSteps,
+                          ),
+                          itemCount: ((lus < widget.totalSteps
+                                  ? widget.totalSteps
+                                  : lus)
+                                ..toInt()) +
+                              (widget.controller.defaultTileLength * 2),
+                          scrollDirection: Axis.horizontal,
                         ),
-                        itemCount:
-                            ((lus < widget.totalSteps ? widget.totalSteps : lus)
-                                  ..toInt()) +
-                                (widget.controller.defaultTileLength * 2),
-                        scrollDirection: Axis.horizontal,
                       ),
                     ),
                   )

@@ -1,9 +1,5 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
-import 'package:timeline_editor/timeline.dart';
-import 'package:timeline_editor/timeline_editor.dart';
-import 'package:timeline_editor/timeline_viewer.dart';
+import 'package:timeline_editor/editable_timeline.dart';
 
 void main() {
   runApp(const MainApp());
@@ -65,6 +61,17 @@ class _MainAppState extends State<MainApp> {
 
   @override
   Widget build(BuildContext context) {
+    final tStyle = TimelineEditorStyle(
+        timelineAndBarHeight: 150,
+        tilePadding:
+            const EdgeInsets.only(top: 8, bottom: 8, left: 2, right: 2),
+        timelineDecoration: BoxDecoration(
+            color: Colors.black12,
+            border: Border.all(
+              color: Colors.black,
+              width: 3,
+            )));
+
     return MaterialApp(
       home: Scaffold(
         floatingActionButton: FloatingActionButton(
@@ -95,19 +102,24 @@ class _MainAppState extends State<MainApp> {
         body: Center(
           child: SizedBox(
             height: 400,
-            child: Column(
-              children: [
-                EditableTimeline(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  EditableTimeline(
                     controller: _controller,
                     // scalingFactor: MediaQuery.of(context).size.width / (8 * 2),
                     totalSteps: 8,
-                    underBarBuilder: barBuilder),
-                TimelineViewer(
-                  tiles: _controller.tiles,
-                  underBarBuilder: barBuilder,
-                  totalSteps: 8,
-                )
-              ],
+                    underBarBuilder: barBuilder,
+                    style: tStyle,
+                  ),
+                  TimelineViewer(
+                      tiles: _controller.tiles,
+                      underBarBuilder: barBuilder,
+                      totalSteps: 8,
+                      style: tStyle)
+                ],
+              ),
             ),
           ),
         ),

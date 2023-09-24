@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:timeline_editor/timeline.dart';
-import 'package:timeline_editor/timeline_editor.dart';
+import 'package:timeline_editor/src/timeline_data.dart';
+import 'package:timeline_editor/src/timeline_editor.dart';
+import 'package:timeline_editor/src/timeline_style.dart';
 
 class TimelineTile extends StatefulWidget {
   final TimedTile tileData;
   final int totalSteps;
   final EditableTimelineController controller;
   final int ownIndex;
+  final TimelineEditorStyle? style;
 
   const TimelineTile(
       {super.key,
       required this.tileData,
       required this.totalSteps,
       required this.controller,
-      required this.ownIndex});
+      required this.ownIndex,
+      this.style});
 
   @override
   State<TimelineTile> createState() => _TimelineTileState();
@@ -39,7 +42,7 @@ class _TimelineTileState extends State<TimelineTile> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(4.0),
+      padding: widget.style?.tilePadding ?? const EdgeInsets.all(4),
       child: SizedBox(
           width: (MediaQuery.of(context).size.width / widget.totalSteps) *
               _displayLength,
