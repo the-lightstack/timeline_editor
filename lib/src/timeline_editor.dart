@@ -80,8 +80,10 @@ class _EditableTimelineState extends State<EditableTimeline> {
                   child: NotificationListener(
                     onNotification: (notification) {
                       if (notification is ScrollUpdateNotification) {
-                        _scrollControllerNamingLine
-                            .jumpTo(_scrollControllerReorderableList.offset);
+                        if (widget.underBarBuilder != null) {
+                          _scrollControllerNamingLine
+                              .jumpTo(_scrollControllerReorderableList.offset);
+                        }
                       }
                       return false;
                     },
