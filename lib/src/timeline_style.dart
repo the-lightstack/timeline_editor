@@ -5,12 +5,14 @@ class TimelineEditorStyle {
   EdgeInsets? tilePadding;
   BoxDecoration? timelineDecoration;
   BoxDecoration? numberlineDecoration;
+  BoxDecoration? resizeSliderDecoration;
   double? timelineAndBarHeight;
-  bool doubleClickDialogAbove;
-  TimelineEditorStyle(
-      {this.numberlineDecoration,
-      this.timelineDecoration,
-      this.tilePadding,
-      this.timelineAndBarHeight,
-      this.doubleClickDialogAbove = true});
+
+  TimelineEditorStyle({
+    this.numberlineDecoration,
+    this.timelineDecoration,
+    this.tilePadding,
+    this.timelineAndBarHeight,
+    this.resizeSliderDecoration,
+  });
 }

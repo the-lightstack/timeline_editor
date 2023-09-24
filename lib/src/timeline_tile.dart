@@ -131,13 +131,20 @@ class _TimelineTileState extends State<TimelineTile> {
                 child: SizedBox(
                   width: 20,
                   child: Container(
-                    decoration: BoxDecoration(
-                        color: _isReseized
-                            ? const Color.fromARGB(255, 112, 112, 112)
-                            : const Color.fromARGB(255, 82, 82, 82),
-                        borderRadius: const BorderRadius.only(
-                            topRight: Radius.circular(5),
-                            bottomRight: Radius.circular(5))),
+                    decoration: widget.style == null ||
+                            widget.style?.resizeSliderDecoration == null
+                        ? BoxDecoration(
+                            color: _isReseized
+                                ? const Color.fromARGB(255, 112, 112, 112)
+                                : const Color.fromARGB(255, 82, 82, 82),
+                            borderRadius: const BorderRadius.only(
+                                topRight: Radius.circular(5),
+                                bottomRight: Radius.circular(5)))
+                        : widget.style!.resizeSliderDecoration!.copyWith(
+                            color: _isReseized
+                                ? widget.style!.resizeSliderDecoration!.color!
+                                    .withOpacity(0.7)
+                                : widget.style!.resizeSliderDecoration!.color!),
                     child: const Center(
                         child: Icon(
                       Icons.double_arrow,
