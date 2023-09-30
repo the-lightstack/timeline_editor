@@ -25,16 +25,19 @@ class TimedTile {
   int? startPosition;
   int? length;
   int? index;
+  Object? data;
 
   TimedTile({
     required this.child,
+    this.data,
   });
 
   TimedTile.internal(
       {required this.index,
       required this.startPosition,
       required this.length,
-      required this.child});
+      required this.child,
+      this.data});
 
   @override
   String toString() => "{Start: $startPosition | Length: $length}";

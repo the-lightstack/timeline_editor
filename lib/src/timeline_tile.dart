@@ -141,10 +141,13 @@ class _TimelineTileState extends State<TimelineTile> {
                                 topRight: Radius.circular(5),
                                 bottomRight: Radius.circular(5)))
                         : widget.style!.resizeSliderDecoration!.copyWith(
-                            color: _isReseized
-                                ? widget.style!.resizeSliderDecoration!.color!
-                                    .withOpacity(0.7)
-                                : widget.style!.resizeSliderDecoration!.color!),
+                            color:
+                                _isReseized // TODO: we assume that color is set, could be wrong though
+                                    ? widget
+                                        .style!.resizeSliderDecoration!.color!
+                                        .withOpacity(0.7)
+                                    : widget
+                                        .style!.resizeSliderDecoration!.color!),
                     child: const Center(
                         child: Icon(
                       Icons.double_arrow,
